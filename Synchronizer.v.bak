@@ -1,0 +1,45 @@
+`timescale 1ns / 1ps
+//////////////////////////////////////////////////////////////////////////////////
+// Company:			Universidad autonoma de Guadalajara. 
+// Engineer:		Electronica Biomedica.  
+// 
+// Create Date:    19:44:35 18/03/2021  
+// Design Name: 
+// Module Name:    Synchronizer 
+// Project Name: 
+// Target Devices: 
+// Tool versions: 
+// Description: 
+//
+// Dependencies: 
+//
+// Revision: 
+// Revision 0.01 - File Created
+// Additional Comments: 
+//
+//////////////////////////////////////////////////////////////////////////////////
+module Synchronizer #(parameter INPUT_SIZE = 1'd1)(
+    input iClk,
+    input iReset,
+    input [INPUT_SIZE-1:0] ivAsynchSignal,
+    output [INPUT_SIZE-1:0] ovSynchSignal
+    );
+
+    /* create INPIT_SIZE instance of the synchronizer */
+    genvar Synchronizers;
+    /* generate allows to create multiple instance of a specific module */
+    generate
+        
+        for (Synchronizers = 0; Synchronizers < INPUT_SIZE; Synchronizers = Synchronizers + 1'd1)
+        begin:SynchModule
+            InputSynch Synch (
+                .iClk(iClk), 
+                .iReset(iReset), 
+                .iAsynchSignal(ivAsynchSignal[Synchronizers]), 
+                .oSynchSignal(ovSynchSignal[Synchronizers])
+                );
+        end
+
+    endgenerate
+
+endmodule

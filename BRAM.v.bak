@@ -1,0 +1,50 @@
+`timescale 1ns / 1ps
+//////////////////////////////////////////////////////////////////////////////////
+// Company:			Universidad autonoma de Guadalajara. 
+// Engineer:		Electronica Biomedica.  
+// 
+// Create Date:    19:44:35 18/03/2021
+// Design Name: 
+// Module Name:    BRAM 
+// Project Name: 
+// Target Devices: 
+// Tool versions: 
+// Description: 
+//
+// Dependencies: 
+//
+// Revision: 
+// Revision 0.01 - File Created
+// Additional Comments: 
+//
+//////////////////////////////////////////////////////////////////////////////////
+module BRAM#(parameter MEM_INIT_FILE = "archivo.txt")(
+    input           iClk,
+    input   [3:0]   ivAddress,
+    input   [7:0]   ivData,
+    input           iWriteEnable,
+    output  [7:0]   ovMemData
+);
+
+    reg [7:0]   rvvMem      [14:0];
+    reg [7:0]   rvData;
+
+    assign	ovMemData  =   rvData;
+   
+    /* initialize the memory array */   
+	 
+    initial
+    begin
+        $readmemh( MEM_INIT_FILE, rvvMem, 0, 14 );
+    end
+
+    always @ (posedge iClk)
+    begin
+        if (iWriteEnable)
+        begin
+            rvvMem[ivAddress] <=  ivData;
+        end	 
+        rvData   <=  rvvMem[ivAddress];
+    end	 
+
+endmodule

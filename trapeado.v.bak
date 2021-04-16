@@ -1,0 +1,75 @@
+`timescale 1ns / 1ps
+//////////////////////////////////////////////////////////////////////////////////
+// Company:			Universidad autonoma de Guadalajara. 
+// Engineer:		Electronica Biomedica.  
+// 
+// Create Date:    19:44:35 18/03/2021 
+// Design Name: 
+// Module Name:    trapeado 
+// Project Name: 
+// Target Devices: 
+// Tool versions: 
+// Description: 
+//
+// Dependencies: 
+//
+// Revision: 
+// Revision 0.01 - File Created
+// Additional Comments: 
+//
+//////////////////////////////////////////////////////////////////////////////////
+module trapeado(
+input iClkTrapeado,
+input iClkETrapeado,
+input iResetTrapeado,
+output [3:0] ovTrapeado
+    );
+
+reg [3:0] rvTrapeado_D = 4'b1000;
+reg [3:0] rvTrapeado_Q = 4'b1000;
+
+assign ovTrapeado = rvTrapeado_Q;
+
+always @ (posedge iClkTrapeado)
+begin
+	if (iResetTrapeado)
+	begin
+		rvTrapeado_Q<=0;
+	end
+	else
+	begin
+		if (iClkETrapeado)
+		begin
+			rvTrapeado_Q<=rvTrapeado_D;
+		end
+		else
+		begin
+			rvTrapeado_Q<=rvTrapeado_Q;
+		end
+	end
+end
+
+always  @*
+begin
+	if (rvTrapeado_Q == 4'b1000)
+		begin
+			rvTrapeado_D = 4'b0100;
+		end
+	else if (rvTrapeado_Q == 4'b0100)
+		begin
+			rvTrapeado_D = 4'b0010;
+		end
+	else if (rvTrapeado_Q == 4'b0010)
+		begin
+			rvTrapeado_D = 4'b0001;
+		end
+	else if (rvTrapeado_Q == 4'b0001)
+		begin
+			rvTrapeado_D = 4'b1000;
+		end		
+	else
+		begin
+			rvTrapeado_D = 4'b1000;
+		end
+end
+endmodule

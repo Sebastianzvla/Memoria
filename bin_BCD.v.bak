@@ -1,0 +1,145 @@
+`timescale 1ns / 1ps
+//////////////////////////////////////////////////////////////////////////////////
+// Company:			Universidad autonoma de Guadalajara. 
+// Engineer:		Electronica Biomedica.  
+// 
+// Create Date:    19:44:35 18/03/2021  
+// Design Name: 
+// Module Name:    bin_BCD 
+// Project Name: 
+// Target Devices: 
+// Tool versions: 
+// Description: 
+//
+// Dependencies: 
+//
+// Revision: 
+// Revision 0.01 - File Created
+// Additional Comments: 
+//
+//////////////////////////////////////////////////////////////////////////////////
+module bin_BCD(
+input iClkBB,
+input iResetBB,
+input iClkEBB,
+input [7:0] ivCuenta,
+output [3:0] ovUnidades,
+output [3:0] ovDecenas,
+output [3:0] ovCentenas,
+output [3:0] ovMillares
+    );
+	 
+reg [23:0] rvBuffer_Q;
+reg [23:0] rvBuffer_D;
+reg [8:0] rvDato_D;
+reg [8:0] rvDato_Q;
+reg [3:0] rvUnidades_Q;
+reg [3:0] rvUnidades_D;
+reg [3:0] rvDecenas_Q;
+reg [3:0] rvDecenas_D;
+reg [3:0] rvCentenas_Q;
+reg [3:0] rvCentenas_D;
+reg [3:0] rvMillares_Q;
+reg [3:0] rvMillares_D;
+
+
+assign ovUnidades = rvUnidades_Q;
+assign ovDecenas = rvDecenas_Q;
+assign ovCentenas = rvCentenas_Q;
+assign ovMillares = rvMillares_Q;
+
+always  @(posedge iClkBB)
+	begin
+	if(iResetBB)
+		begin
+			rvBuffer_Q<= 0;
+			rvDato_Q<= 8'd1;
+			rvUnidades_Q<= 0;
+			rvDecenas_Q<= 0;
+			rvCentenas_Q<= 0;
+			rvMillares_Q<= 0;
+		end
+	else if (iClkEBB)
+		begin
+			rvBuffer_Q<= rvBuffer_D;
+			rvDato_Q<= rvDato_D;
+			rvUnidades_Q<= rvUnidades_D;
+			rvDecenas_Q<= rvDecenas_D;
+			rvCentenas_Q<= rvCentenas_D;
+			rvMillares_Q<= rvMillares_D;
+			end
+	else
+		begin
+			rvBuffer_Q<= rvBuffer_Q;
+			rvDato_Q<= rvDato_Q;
+			rvUnidades_Q<= rvUnidades_Q;
+			rvDecenas_Q<= rvDecenas_Q;
+			rvCentenas_Q<= rvCentenas_Q;
+			rvMillares_Q<= rvMillares_Q;
+		end
+	end
+
+always @*
+begin
+	rvUnidades_D = rvUnidades_Q;
+	rvDecenas_D = rvDecenas_Q;
+	rvCentenas_D = rvCentenas_Q;
+	rvMillares_D = rvMillares_Q;
+		if (rvDato_Q == 8'd1)
+			begin
+				rvBuffer_D = {24'd0,ivCuenta[7:0]};
+				rvUnidades_D = rvBuffer_Q[11:8];
+				rvDecenas_D  = rvBuffer_Q[15:12];
+				rvCentenas_D = rvBuffer_Q[19:16];
+				rvMillares_D  = rvBuffer_Q[23:20];
+			end
+		else if (rvDato_Q== 9'b100000000)
+			begin
+				rvBuffer_D[23:0] = {rvBuffer_Q[22:0],1'b0};
+			end
+		else  
+			begin
+				rvBuffer_D = rvBuffer_Q << 1;
+																   
+					if(rvBuffer_Q[10:7] > 4'd4)
+						begin
+							rvBuffer_D[11:8] = rvBuffer_Q[10:7] + 4'd3;
+						end
+					else
+						begin
+							rvBuffer_D[11:8] = rvBuffer_Q[10:7];
+						end
+						
+					if(rvBuffer_Q[14:11] > 4'd4)
+						begin
+							rvBuffer_D[15:12] = rvBuffer_Q[14:11] + 4'd3;
+						end
+					else
+						begin
+							rvBuffer_D[15:12] = rvBuffer_Q[14:11];
+						end
+						
+					if(rvBuffer_Q[18:15] > 4'd4)
+						begin
+							rvBuffer_D[19:16] = rvBuffer_Q[18:15] + 4'd3;
+						end
+					else
+						begin
+							rvBuffer_D[19:16] = rvBuffer_Q[18:15];
+						end
+						
+					if(rvBuffer_Q[22:19] > 4'd4)
+						begin
+							rvBuffer_D[23:20] = rvBuffer_Q[22:19] + 4'd3;
+						end
+					else
+						begin
+							rvBuffer_D[23:20] = rvBuffer_Q[22:19];
+						end
+	end
+end
+	always @*        
+	begin
+		rvDato_D = {rvDato_Q[7:0],rvDato_Q[8]};   
+	end 
+endmodule 

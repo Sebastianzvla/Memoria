@@ -1,0 +1,70 @@
+`timescale 1ns / 1ps
+//////////////////////////////////////////////////////////////////////////////////
+// Company:			Universidad autonoma de Guadalajara. 
+// Engineer:		Electronica Biomedica.  
+// 
+// Create Date:    19:44:35 18/03/2021
+// Design Name: 
+// Module Name:    divisor 
+// Project Name: 
+// Target Devices: 
+// Tool versions: 
+// Description: 
+//
+// Dependencies: 
+//
+// Revision: 
+// Revision 0.01 - File Created
+// Additional Comments: 
+//
+//////////////////////////////////////////////////////////////////////////////////
+module divisor(
+input iClkDiv,
+input iResetDiv,
+input iClkEDiv,
+output oClkMod
+    );
+
+reg rFFDiv_Q;
+reg rFFDiv_D;
+reg [9:0] rvFFCont_Q=0;
+reg [9:0] rvFFCont_D=0;
+
+assign oClkMod = rFFDiv_Q;
+
+always @ (posedge iClkDiv)
+begin
+	if (iResetDiv)
+	begin
+		rFFDiv_Q<=0;
+		rvFFCont_Q<=0;
+	end
+	else
+	begin
+		if (iClkEDiv)
+		begin
+			rFFDiv_Q<=rFFDiv_D;
+			rvFFCont_Q<=rvFFCont_D;
+		end
+		else
+		begin
+			rFFDiv_Q<=rFFDiv_Q;
+			rvFFCont_Q<=rvFFCont_Q;
+		end
+	end
+end
+
+always @*
+begin
+	if (rvFFCont_Q == 10'd1000)
+		begin
+			rFFDiv_D=1;
+			rvFFCont_D=0;
+		end
+	else
+		begin
+			rvFFCont_D= rvFFCont_Q + 10'd1;
+			rFFDiv_D=0;
+		end
+end
+endmodule

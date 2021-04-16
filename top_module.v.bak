@@ -1,0 +1,151 @@
+`timescale 1ns / 1ps
+//////////////////////////////////////////////////////////////////////////////////
+// Company: 
+// Engineer: 
+// 
+// Create Date:    19:44:35 18/03/2021 
+// Design Name: 
+// Module Name:    top_module 
+// Project Name: 
+// Target Devices: 
+// Tool versions: 
+// Description: 
+//
+// Dependencies: 
+//
+// Revision: 
+// Revision 0.01 - File Created
+// Additional Comments: 
+//
+//////////////////////////////////////////////////////////////////////////////////
+module top_module(
+input iClk,
+input iReset,
+input [7:0] ivSwitches,
+output[6:0] ovDisplay,
+output [3:0] ovDisplayNum
+    );
+
+wire [3:0] wvUnidades;
+wire [3:0] wvDecenas;
+wire [3:0] wvCentenas;
+wire [3:0] wvMillares;
+wire [6:0] wvDisplay1;
+wire [6:0] wvDisplay2;
+wire [6:0] wvDisplay3;
+wire [6:0] wvDisplay4;
+wire wClkDiv;
+wire [3:0] wvBarridoMux;
+wire [3:0] wvAddresSynch;
+wire [3:0] wvAddressSelect;
+wire [7:0] wvMemoryData;
+wire [7:0] wvCounter;
+
+assign ovDisplayNum= ~wvBarridoMux;
+
+	trapeadoarchivo trapeadoarchivo(
+	.iClkTrapeado (iClk),
+	.iClkETrapeado (wClkDiv),
+	.iResetTrapeado (iReset),
+	.ovTrapeado (wvAddressSelect)
+	);
+
+	 
+	Synchronizer #(4) AddressSynch (
+    .iClk(iClk), 
+    .iReset(iReset), 
+    .ivAsynchSignal(wvAddressSelect), 
+    .ovSynchSignal(wvAddresSynch)
+    );
+
+	 BRAM #("archivo.txt")BRAM(
+    .iClk(iClk), 
+    .iWriteEnable(1'd0), 
+    .ivData(8'd0), 
+    .ivAddress(wvAddresSynch), 
+    .ovMemData(wvMemoryData)
+    );
+	 
+	counter counter(
+	.iClkC (iClk),
+	.iResetC (iReset),
+	.iClkEC (1'b1),
+	.ivData (wvMemoryData),
+	.ivSwitches (ivSwitches),
+	.ovCuenta (wvCounter)
+	);
+	
+	
+	bin_BCD bin_BCD(
+	.iClkBB (iClk),
+	.iResetBB (iReset),
+	.iClkEBB (1'b1),
+	.ivCuenta (wvCounter),
+	.ovUnidades (wvUnidades),
+	.ovDecenas (wvDecenas),
+	.ovCentenas (wvCentenas),
+	.ovMillares (wvMillares)
+	);
+	
+	
+	decodificador decodificador1(
+	.ivCuenta (wvUnidades),
+	.iClkEBCD (1'b1),
+	.iResetBCD (iReset),
+	.iClkBCD (iClk),
+	.oOut (wvDisplay1)
+	);
+	
+	decodificador decodificador2(
+	.ivCuenta (wvDecenas),
+	.iClkEBCD (1'b1),
+	.iResetBCD (iReset),
+	.iClkBCD (iClk),
+	.oOut (wvDisplay2)
+	);
+	
+	decodificador decodificador3(
+	.ivCuenta (wvCentenas),
+	.iClkEBCD (1'b1),
+	.iResetBCD (iReset),
+	.iClkBCD (iClk),
+	.oOut (wvDisplay3)
+	);
+	
+	decodificador decodificador4(
+	.ivCuenta (wvMillares),
+	.iClkEBCD (1'b1),
+	.iResetBCD (iReset),
+	.iClkBCD (iClk),
+	.oOut (wvDisplay4)
+	);
+	
+	divisor divisor(
+	.iClkDiv (iClk),
+	.iClkEDiv (1'b1),
+	.iResetDiv (iReset),
+	.oClkMod (wClkDiv)
+	);
+	
+	
+	trapeado trapeado(
+	.iClkTrapeado (iClk),
+	.iClkETrapeado (wClkDiv),
+	.iResetTrapeado (iReset),
+	.ovTrapeado (wvBarridoMux)
+	);
+
+	multiplexor multiplexor(
+	.iClkMux (iClk),
+	.iClkEMux (1'b1),
+	.iResetMux (iReset),
+	.ivSel (wvBarridoMux),
+	.ivDisplay1 (wvDisplay1),
+	.ivDisplay2 (wvDisplay2),
+	.ivDisplay3 (wvDisplay3),
+	.ivDisplay4 (wvDisplay4),
+	.ovSalida (ovDisplay)
+	);
+	
+
+endmodule

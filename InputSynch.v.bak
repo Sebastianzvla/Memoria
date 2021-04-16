@@ -1,0 +1,56 @@
+`timescale 1ns / 1ps
+//////////////////////////////////////////////////////////////////////////////////
+// Company:			Universidad autonoma de Guadalajara. 
+// Engineer:		Electronica Biomedica.  
+// 
+// Create Date:    19:44:35 18/03/2021 
+// Design Name: 
+// Module Name:    Synch 
+// Project Name: 
+// Target Devices: 
+// Tool versions: 
+// Description: 
+//
+// Dependencies: 
+//
+// Revision: 
+// Revision 0.01 - File Created
+// Additional Comments: 
+//
+//////////////////////////////////////////////////////////////////////////////////
+module InputSynch(
+input iClk,
+input iReset,
+input iAsynchSignal,
+output oSynchSignal
+    );
+
+reg [3:0] rvSignal_D;
+reg [3:0] rvSignal_Q;
+
+	assign oSynchSignal = rvSignal_Q[3];
+	
+	always@(posedge iClk)
+	begin
+		if(iReset)
+		begin
+	
+			rvSignal_Q <= 0;
+		end
+		else
+		begin
+		
+			rvSignal_Q	<= rvSignal_D;		
+		end
+	end
+	
+	
+	always@*
+	begin
+		
+		rvSignal_D[3:0] = {rvSignal_Q[2:0],iAsynchSignal};
+	
+	end
+
+endmodule
+

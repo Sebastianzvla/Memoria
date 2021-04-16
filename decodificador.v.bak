@@ -1,0 +1,100 @@
+`timescale 1ns / 1ps
+//////////////////////////////////////////////////////////////////////////////////
+// Company:			Universidad autonoma de Guadalajara. 
+// Engineer:		Electronica Biomedica.  
+// 
+// Create Date:    19:44:35 18/03/2021
+// Design Name: 
+// Module Name:    decodificador 
+// Project Name: 
+// Target Devices: 
+// Tool versions: 
+// Description: 
+//
+// Dependencies: 
+//
+// Revision: 
+// Revision 0.01 - File Created
+// Additional Comments: 
+//
+//////////////////////////////////////////////////////////////////////////////////
+module decodificador(
+input [3:0]ivCuenta,
+input iClkBCD,
+input iClkEBCD,
+input iResetBCD,
+output [6:0] oOut   
+);
+
+reg [6:0] ro_D;
+reg [6:0] ro_Q;
+
+assign oOut= ~ro_Q;
+
+always @ (posedge iClkBCD)
+begin
+	if (iResetBCD)
+	begin
+		ro_Q<=0;
+	end
+	else
+	begin
+		if (iClkEBCD)
+		begin
+			ro_Q<=ro_D;
+		end
+		else
+		begin
+			ro_Q<=ro_Q;
+		end
+	end
+end
+
+always @*
+begin
+			if (ivCuenta == 4'd0)
+				begin
+					ro_D= 7'b1111110;
+				end
+				else if (ivCuenta == 4'd1)
+					begin
+						ro_D= 7'b0110000;
+					end
+				else if (ivCuenta == 4'd2)
+					begin
+						ro_D= 7'b1101101;
+					end
+				else if (ivCuenta == 4'd3)
+					begin
+						ro_D= 7'b1111001;
+					end
+				else if (ivCuenta == 4'd4)
+					begin
+						ro_D= 7'b0110011;
+					end
+				else if (ivCuenta == 4'd5)
+					begin
+						ro_D= 7'b1011011;
+					end
+				else if (ivCuenta == 4'd6)
+					begin
+						ro_D= 7'b1011111;
+					end
+				else if (ivCuenta == 4'd7)
+					begin
+						ro_D= 7'b1110000;
+					end
+				else if (ivCuenta == 4'd8)
+					begin
+						ro_D= 7'b1111111;
+					end
+				else if (ivCuenta == 4'd9)
+					begin
+						ro_D= 7'b1111011;
+					end
+				else
+					begin
+						ro_D= 7'b1111110;
+					end
+end
+endmodule 
